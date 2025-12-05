@@ -1,0 +1,14 @@
+# Claude/Editor files
+.claude/
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temp files
+*.tmp
+nul
+
+# Documentation (optional - can be included)
+SUPABASE-IMPLEMENTATION-GUIDE.md
