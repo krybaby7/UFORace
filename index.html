@@ -603,6 +603,132 @@
             box-shadow: 0 0 20px rgba(255, 77, 148, 0.5);
             border-color: rgba(255, 77, 148, 0.8);
         }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            #gameContainer { padding: 10px; }
+            h1 { font-size: 1.5em; }
+            .controls { flex-direction: column; gap: 10px; }
+            .player-info { min-width: 150px; font-size: 1em; padding: 10px; }
+            button { padding: 12px 20px; font-size: 1em; }
+            .controls-preview { display: none; }
+            #startScreen { padding: 20px; max-width: 95vw; }
+            #startScreen h2 { font-size: 2em; }
+            .coin-display { font-size: 1.5em; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.2em; }
+            .player-info { min-width: 120px; }
+            button { padding: 10px 15px; font-size: 0.9em; }
+            #startScreen h2 { font-size: 1.5em; }
+        }
+
+        /* Touch controls styling */
+        #touchControls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .dpad-container {
+            display: grid;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 60px 60px 60px;
+            gap: 5px;
+        }
+
+        .dpad-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: rgba(138, 243, 255, 0.4);
+            border: 2px solid rgba(138, 243, 255, 0.6);
+            color: #8af3ff;
+            font-size: 24px;
+            font-weight: bold;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dpad-btn:active {
+            background: rgba(138, 243, 255, 0.7);
+            transform: scale(0.95);
+        }
+
+        .dpad-up { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-down { grid-column: 2; grid-row: 3; }
+        .dpad-center { grid-column: 2; grid-row: 2; background: transparent; border: none; }
+
+        /* Mobile play button */
+        .mobile-only {
+            display: none;
+        }
+
+        @media (pointer: coarse) {
+            .mobile-only {
+                display: inline-block;
+            }
+            .desktop-only {
+                display: none;
+            }
+        }
+
+        /* Exit button for mobile */
+        #mobileExitBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            padding: 10px 15px;
+            font-size: 14px;
+            background: rgba(255, 77, 148, 0.8);
+            border: 2px solid rgba(255, 77, 148, 0.9);
+            border-radius: 8px;
+            color: white;
+            display: none;
+        }
+
+        /* Fullscreen canvas adjustments */
+        :fullscreen #gameContainer {
+            padding: 5px;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            background: #0a0a1a;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        :fullscreen #canvas {
+            max-width: 100vw;
+            max-height: calc(100vh - 100px);
+        }
+
+        :fullscreen .controls {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        :fullscreen #touchControls {
+            bottom: 10px;
+            left: 10px;
+        }
     </style>
 </head>
 
@@ -641,10 +767,11 @@
             </button>
         </div>
 
-        <button class="start-btn" onclick="startGame()">START GAME!</button>
+        <button class="start-btn desktop-only" onclick="startGame()">START GAME!</button>
+        <button class="start-btn mobile-only" onclick="startMobileGame()" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%);">📱 PLAY FULLSCREEN</button>
         <button class="shop-btn" onclick="openShop()">🛒 SHOP</button>
         <button class="leaderboard-btn" onclick="openLeaderboard()">🏆 HIGH SCORES</button>
-        <button onclick="toggleFullscreen()"
+        <button class="desktop-only" onclick="toggleFullscreen()"
             style="background: linear-gradient(135deg, rgba(0, 201, 255, 0.5) 0%, rgba(146, 254, 157, 0.5) 100%); border-color: rgba(0, 201, 255, 0.5);">🖥️
             FULLSCREEN</button>
         <div class="controls-preview">
@@ -715,6 +842,20 @@
         <button type="button" onclick="exitToMenu()" style="margin-top: 20px;">⬅️ Exit to Menu (Q)</button>
     </div>
 
+    <!-- Touch Controls for Mobile -->
+    <div id="touchControls">
+        <div class="dpad-container">
+            <button class="dpad-btn dpad-up" type="button">↑</button>
+            <button class="dpad-btn dpad-left" type="button">←</button>
+            <div class="dpad-center"></div>
+            <button class="dpad-btn dpad-right" type="button">→</button>
+            <button class="dpad-btn dpad-down" type="button">↓</button>
+        </div>
+    </div>
+
+    <!-- Mobile Exit Button -->
+    <button id="mobileExitBtn" type="button" onclick="exitMobileGame()">✕ EXIT</button>
+
     <div id="gameOver">
         <h2>Game Over!</h2>
         <p id="winnerText"></p>
@@ -771,6 +912,142 @@
         }
         // ================================================================
 
+        // ==================== MOBILE DETECTION & SETUP ====================
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        let isMobileFullscreen = false;
+
+        // Setup touch controls if on mobile
+        function setupTouchControls() {
+            if (!isMobile) return;
+
+            const touchControls = document.getElementById('touchControls');
+            const directions = {
+                'dpad-up': { x: 0, y: -1 },
+                'dpad-down': { x: 0, y: 1 },
+                'dpad-left': { x: -1, y: 0 },
+                'dpad-right': { x: 1, y: 0 }
+            };
+
+            Object.keys(directions).forEach(className => {
+                const btn = document.querySelector('.' + className);
+                if (btn) {
+                    // Touch start - set direction
+                    btn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        if (gameRunning && typeof snake1 !== 'undefined') {
+                            snake1.nextDirection = directions[className];
+                        }
+                        btn.style.background = 'rgba(138, 243, 255, 0.8)';
+                    }, { passive: false });
+
+                    // Touch end - visual feedback
+                    btn.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        btn.style.background = 'rgba(138, 243, 255, 0.4)';
+                    }, { passive: false });
+                }
+            });
+        }
+
+        // Start mobile game with fullscreen and landscape lock
+        async function startMobileGame() {
+            try {
+                // Set to solo mode for mobile
+                document.getElementById('gameModeSelect').value = 'solo';
+
+                // Request fullscreen
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    await elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    await elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    await elem.msRequestFullscreen();
+                }
+
+                // Lock to landscape orientation
+                if (screen.orientation && screen.orientation.lock) {
+                    try {
+                        await screen.orientation.lock('landscape');
+                    } catch (err) {
+                        console.log('Orientation lock not supported:', err);
+                    }
+                }
+
+                isMobileFullscreen = true;
+
+                // Show touch controls and mobile exit button
+                document.getElementById('touchControls').style.display = 'block';
+                document.getElementById('mobileExitBtn').style.display = 'block';
+
+                // Start the game
+                startGame();
+
+            } catch (err) {
+                console.log('Fullscreen error:', err);
+                // Fallback: start game without fullscreen
+                document.getElementById('gameModeSelect').value = 'solo';
+                document.getElementById('touchControls').style.display = 'block';
+                startGame();
+            }
+        }
+
+        // Exit mobile fullscreen game
+        function exitMobileGame() {
+            // Hide touch controls
+            document.getElementById('touchControls').style.display = 'none';
+            document.getElementById('mobileExitBtn').style.display = 'none';
+
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+
+            // Unlock orientation
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
+
+            isMobileFullscreen = false;
+
+            // Exit to menu
+            exitToMenu();
+        }
+
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                // Exited fullscreen
+                if (isMobileFullscreen) {
+                    document.getElementById('touchControls').style.display = 'none';
+                    document.getElementById('mobileExitBtn').style.display = 'none';
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                    isMobileFullscreen = false;
+                }
+            }
+        }
+
+        // Prevent default touch behaviors during gameplay
+        document.addEventListener('touchmove', (e) => {
+            if (gameRunning && isMobileFullscreen) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Initialize touch controls on page load
+        document.addEventListener('DOMContentLoaded', setupTouchControls);
+        // ================================================================
+
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
@@ -779,16 +1056,45 @@
         const canvasWidth = 1200;
         const canvasHeight = 600;
 
-        // Set display size (CSS pixels)
-        canvas.style.width = canvasWidth + 'px';
-        canvas.style.height = canvasHeight + 'px';
-
         // Set actual canvas size (device pixels)
         canvas.width = canvasWidth * dpr;
         canvas.height = canvasHeight * dpr;
 
         // Scale context to match device pixel ratio
         ctx.scale(dpr, dpr);
+
+        // Responsive canvas sizing for mobile
+        function resizeCanvasDisplay() {
+            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+            const padding = isFullscreen ? 20 : 40;
+            const maxWidth = window.innerWidth - padding;
+            const maxHeight = window.innerHeight - (isFullscreen ? 120 : 200);
+            const aspectRatio = canvasWidth / canvasHeight; // 2:1
+
+            let displayWidth = maxWidth;
+            let displayHeight = displayWidth / aspectRatio;
+
+            if (displayHeight > maxHeight) {
+                displayHeight = maxHeight;
+                displayWidth = displayHeight * aspectRatio;
+            }
+
+            // Apply constraints
+            displayWidth = Math.min(displayWidth, canvasWidth);
+            displayHeight = Math.min(displayHeight, canvasHeight);
+
+            canvas.style.width = displayWidth + 'px';
+            canvas.style.height = displayHeight + 'px';
+        }
+
+        // Initial sizing
+        resizeCanvasDisplay();
+
+        // Resize on window changes
+        window.addEventListener('resize', resizeCanvasDisplay);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(resizeCanvasDisplay, 100);
+        });
 
         const GRID_SIZE = 20;
         const COLS = Math.floor(canvasWidth / GRID_SIZE);
