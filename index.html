@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UFO Race - Wyścig UFO</title>
+    <title>UFO Race - Space Racing</title>
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -609,91 +609,91 @@
 <body>
     <div id="startScreen">
         <h2>🛸 UFO RACE 🛸</h2>
-        <div class="coin-display">💰 Monety: <span id="totalCoins">0</span></div>
+        <div class="coin-display">💰 Coins: <span id="totalCoins">0</span></div>
 
         <div style="margin: 20px 0;">
             <label
-                style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Tryb
-                Gry:</label>
+                style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Game
+                Mode:</label>
             <select id="gameModeSelect"
                 style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
-                <option value="multiplayer" selected>2 Graczy</option>
+                <option value="multiplayer" selected>2 Players</option>
                 <option value="solo">Solo</option>
             </select>
         </div>
 
         <div style="margin: 20px 0;">
             <label
-                style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Trudność:</label>
+                style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Difficulty:</label>
             <select id="difficultySelect"
                 style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
-                <option value="easy">Łatwa</option>
-                <option value="normal" selected>Normalna</option>
-                <option value="hard">Trudna</option>
-                <option value="very-difficult">Bardzo Trudna</option>
+                <option value="easy">Easy</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+                <option value="very-difficult">Very Hard</option>
             </select>
         </div>
 
         <div style="margin: 20px 0;">
             <button type="button" id="muteToggle" class="mute-btn">
                 <span class="mute-icon">🔊</span>
-                <span class="mute-text">Muzyka</span>
+                <span class="mute-text">Music</span>
             </button>
         </div>
 
-        <button class="start-btn" onclick="startGame()">START GRY!</button>
-        <button class="shop-btn" onclick="openShop()">🛒 SKLEP</button>
-        <button class="leaderboard-btn" onclick="openLeaderboard()">🏆 NAJLEPSZE WYNIKI</button>
+        <button class="start-btn" onclick="startGame()">START GAME!</button>
+        <button class="shop-btn" onclick="openShop()">🛒 SHOP</button>
+        <button class="leaderboard-btn" onclick="openLeaderboard()">🏆 HIGH SCORES</button>
         <button onclick="toggleFullscreen()"
             style="background: linear-gradient(135deg, rgba(0, 201, 255, 0.5) 0%, rgba(146, 254, 157, 0.5) 100%); border-color: rgba(0, 201, 255, 0.5);">🖥️
-            PEŁNY EKRAN</button>
+            FULLSCREEN</button>
         <div class="controls-preview">
-            <h3>Jak grać (2 Graczy):</h3>
-            <p><strong>🎮 Gracz 1 (Różowy):</strong> W A S D</p>
-            <p><strong>🎮 Gracz 2 (Niebieski):</strong> Strzałki ↑ ← ↓ →</p>
-            <p>🛸 UFO poruszają się w kierunku ostatnio naciśniętego klawisza!</p>
-            <p>💎 Zbierajcie kryształy energii aby zdobyć punkty</p>
-            <p>⚠️ Uważaj na asteroidy i nie spadnij z ekranu!</p>
-            <p>🏆 Wygrywa pilot z więcej punktami!</p>
-            <p>💰 Punkty obu graczy zamieniają się na monety!</p>
-            <p><strong>⬅️ Wyjście:</strong> Naciśnij Q aby wrócić do menu</p>
+            <h3>How to Play (2 Players):</h3>
+            <p><strong>🎮 Player 1 (Pink):</strong> W A S D</p>
+            <p><strong>🎮 Player 2 (Blue):</strong> Arrows ↑ ← ↓ →</p>
+            <p>🛸 UFOs move in the direction of the last key pressed!</p>
+            <p>💎 Collect energy crystals to gain points</p>
+            <p>⚠️ Watch out for asteroids and don't fall off screen!</p>
+            <p>🏆 The pilot with more points wins!</p>
+            <p>💰 Both players' points convert to coins!</p>
+            <p><strong>⬅️ Exit:</strong> Press Q to return to menu</p>
         </div>
     </div>
 
     <div id="shopScreen">
-        <h2>🛒 SKLEP</h2>
-        <div class="coin-display">💰 Monety: <span id="shopCoins">0</span></div>
+        <h2>🛒 SHOP</h2>
+        <div class="coin-display">💰 Coins: <span id="shopCoins">0</span></div>
 
         <div class="player-selector" style="margin-bottom: 10px;">
-            <div class="player-tab player-select active" onclick="selectPlayerTab(1)">👤 Gracz 1</div>
-            <div class="player-tab player-select" onclick="selectPlayerTab(2)">👤 Gracz 2</div>
+            <div class="player-tab player-select active" onclick="selectPlayerTab(1)">👤 Player 1</div>
+            <div class="player-tab player-select" onclick="selectPlayerTab(2)">👤 Player 2</div>
         </div>
 
         <div class="player-selector">
             <div class="player-tab shop-tab active" onclick="selectShopTab('skins')">🛸 UFO</div>
-            <div class="player-tab shop-tab" onclick="selectShopTab('themes')">🌌 Tła</div>
+            <div class="player-tab shop-tab" onclick="selectShopTab('themes')">🌌 Backgrounds</div>
         </div>
 
         <div id="skinsContainer" class="skins-grid"></div>
         <div id="themesContainer" class="skins-grid" style="display:none;"></div>
 
-        <button onclick="closeShop()">Wróć do Menu</button>
+        <button onclick="closeShop()">Back to Menu</button>
     </div>
 
     <div id="leaderboardScreen" style="display:none;">
-        <h2>🏆 NAJLEPSZE WYNIKI</h2>
+        <h2>🏆 HIGH SCORES</h2>
         <div class="leaderboard-container">
             <div class="leaderboard-header">
-                <div class="rank-col">Miejsce</div>
-                <div class="name-col">Gracz</div>
-                <div class="score-col">Punkty</div>
-                <div class="mode-col">Tryb</div>
+                <div class="rank-col">Rank</div>
+                <div class="name-col">Player</div>
+                <div class="score-col">Points</div>
+                <div class="mode-col">Mode</div>
             </div>
             <div id="leaderboardEntries" class="leaderboard-entries">
                 <!-- Leaderboard entries will be inserted here -->
             </div>
         </div>
-        <button onclick="closeLeaderboard()">Wróć do Menu</button>
+        <button onclick="closeLeaderboard()">Back to Menu</button>
     </div>
 
     <div id="gameContainer" style="display:none;">
@@ -701,52 +701,52 @@
 
         <div class="controls">
             <div class="player-info player1" id="player1Info">
-                <div>Gracz 1 <span id="lives1">❤️❤️❤️</span></div>
-                <div>Punkty: <span id="score1">0</span></div>
+                <div>Player 1 <span id="lives1">❤️❤️❤️</span></div>
+                <div>Points: <span id="score1">0</span></div>
             </div>
             <div class="player-info player2" id="player2Info">
-                <div>Gracz 2 <span id="lives2">❤️❤️❤️</span></div>
-                <div>Punkty: <span id="score2">0</span></div>
+                <div>Player 2 <span id="lives2">❤️❤️❤️</span></div>
+                <div>Points: <span id="score2">0</span></div>
             </div>
         </div>
 
         <canvas id="canvas" width="1200" height="600"></canvas>
 
-        <button type="button" onclick="exitToMenu()" style="margin-top: 20px;">⬅️ Wyjście do Menu (Q)</button>
+        <button type="button" onclick="exitToMenu()" style="margin-top: 20px;">⬅️ Exit to Menu (Q)</button>
     </div>
 
     <div id="gameOver">
-        <h2>Koniec Gry!</h2>
+        <h2>Game Over!</h2>
         <p id="winnerText"></p>
-        <p>Gracz 1: <span id="finalScore1">0</span> punktów</p>
-        <p>Gracz 2: <span id="finalScore2">0</span> punktów</p>
-        <p class="earned-coins">💰 Zdobyte monety: +<span id="earnedCoins">0</span></p>
-        <button onclick="backToMenu()">Menu Główne</button>
-        <button onclick="restartGame()">Zagraj Ponownie</button>
+        <p>Player 1: <span id="finalScore1">0</span> points</p>
+        <p>Player 2: <span id="finalScore2">0</span> points</p>
+        <p class="earned-coins">💰 Coins Earned: +<span id="earnedCoins">0</span></p>
+        <button onclick="backToMenu()">Main Menu</button>
+        <button onclick="restartGame()">Play Again</button>
     </div>
 
     <div id="confirmModal">
         <div class="confirm-content">
-            <h3 id="confirmMessage">Czy na pewno?</h3>
+            <h3 id="confirmMessage">Are you sure?</h3>
             <div class="confirm-buttons">
-                <button id="confirmYes" class="confirm-btn yes-btn">TAK</button>
-                <button id="confirmNo" class="confirm-btn no-btn">NIE</button>
+                <button id="confirmYes" class="confirm-btn yes-btn">YES</button>
+                <button id="confirmNo" class="confirm-btn no-btn">NO</button>
             </div>
         </div>
     </div>
 
     <div id="nameEntryModal" style="display: none;">
         <div class="name-entry-content">
-            <h3>🏆 Nowy Rekord!</h3>
-            <p style="margin: 15px 0; color: #8af3ff;">Twój wynik: <span id="newHighScore">0</span> punktów</p>
-            <p style="margin-bottom: 15px; color: #92fe9d;">Wpisz swoje imię:</p>
-            <input type="text" id="playerNameInput" maxlength="20" placeholder="Wpisz imię..."
+            <h3>🏆 New Record!</h3>
+            <p style="margin: 15px 0; color: #8af3ff;">Your score: <span id="newHighScore">0</span> points</p>
+            <p style="margin-bottom: 15px; color: #92fe9d;">Enter your name:</p>
+            <input type="text" id="playerNameInput" maxlength="20" placeholder="Enter name..."
                    style="padding: 10px; font-size: 1.2em; width: 250px; text-align: center;
                           border: 2px solid #8af3ff; border-radius: 5px; background: #1a1a3e;
                           color: #8af3ff;">
             <div style="margin-top: 20px;">
-                <button onclick="saveHighScore()" class="confirm-btn yes-btn">Zapisz</button>
-                <button onclick="skipHighScore()" class="confirm-btn no-btn">Pomiń</button>
+                <button onclick="saveHighScore()" class="confirm-btn yes-btn">Save</button>
+                <button onclick="skipHighScore()" class="confirm-btn no-btn">Skip</button>
             </div>
         </div>
     </div>
@@ -860,48 +860,48 @@
         let ownedThemes = JSON.parse(localStorage.getItem('ownedThemes') || '["default"]');
 
         const skins = {
-            default1: { name: '🛸 Różowy Klasyk', color: '#ff4d94', price: 0, pattern: 'solid' },
-            default2: { name: '🛸 Niebieski Klasyk', color: '#4dd4ff', price: 0, pattern: 'solid' },
-            green: { name: '👽 Zielony Marsjanin', color: '#00ff88', price: 50, pattern: 'solid' },
-            purple: { name: '🔮 Fioletowy Mag', color: '#bb00ff', price: 50, pattern: 'solid' },
-            gold: { name: '👑 Złoty Król', color: '#ffd700', price: 100, pattern: 'solid' },
-            orange: { name: '🔥 Ognisty Komet', color: '#ff8800', price: 100, pattern: 'solid' },
-            turquoise: { name: '💎 Kryształowy', color: '#40E0D0', price: 100, pattern: 'solid' },
-            silver: { name: '🌟 Srebrna Gwiazda', color: '#C0C0C0', price: 150, pattern: 'solid' },
-            red: { name: '👹 Czerwony Diabeł', color: '#ff0000', price: 150, pattern: 'solid' },
-            cyan: { name: '❄️ Lodowy', color: '#00ffff', price: 150, pattern: 'solid' },
-            neonpink: { name: '💖 Neonowy Róż', color: '#ff0099', price: 200, pattern: 'solid' },
-            lime: { name: '☢️ Radioaktywny', color: '#ccff00', price: 200, pattern: 'solid' },
-            navy: { name: '🌊 Głębinowy', color: '#000099', price: 250, pattern: 'solid' },
-            rainbow: { name: '🌈 Tęczowy', color: '#ff00ff', price: 300, pattern: 'rainbow' },
+            default1: { name: '🛸 Pink Classic', color: '#ff4d94', price: 0, pattern: 'solid' },
+            default2: { name: '🛸 Blue Classic', color: '#4dd4ff', price: 0, pattern: 'solid' },
+            green: { name: '👽 Green Martian', color: '#00ff88', price: 50, pattern: 'solid' },
+            purple: { name: '🔮 Purple Wizard', color: '#bb00ff', price: 50, pattern: 'solid' },
+            gold: { name: '👑 Golden King', color: '#ffd700', price: 100, pattern: 'solid' },
+            orange: { name: '🔥 Fiery Comet', color: '#ff8800', price: 100, pattern: 'solid' },
+            turquoise: { name: '💎 Crystal', color: '#40E0D0', price: 100, pattern: 'solid' },
+            silver: { name: '🌟 Silver Star', color: '#C0C0C0', price: 150, pattern: 'solid' },
+            red: { name: '👹 Red Devil', color: '#ff0000', price: 150, pattern: 'solid' },
+            cyan: { name: '❄️ Icy', color: '#00ffff', price: 150, pattern: 'solid' },
+            neonpink: { name: '💖 Neon Pink', color: '#ff0099', price: 200, pattern: 'solid' },
+            lime: { name: '☢️ Radioactive', color: '#ccff00', price: 200, pattern: 'solid' },
+            navy: { name: '🌊 Deep Sea', color: '#000099', price: 250, pattern: 'solid' },
+            rainbow: { name: '🌈 Rainbow', color: '#ff00ff', price: 300, pattern: 'rainbow' },
             stealth: { name: '🥷 Stealth', color: '#1a1a1a', price: 300, pattern: 'solid' },
-            plasma: { name: '⚡ Plazmowy', color: '#8800ff', price: 350, pattern: 'solid' },
-            cosmic: { name: '🌌 Kosmiczny', color: '#4a0080', price: 350, pattern: 'solid' },
-            ghost: { name: '👻 Widmo', color: '#88ffff', price: 400, pattern: 'solid' },
-            inferno: { name: '🌋 Piekło', color: '#ff3300', price: 400, pattern: 'solid' },
-            emerald: { name: '💚 Szmaragdowy', color: '#00cc66', price: 450, pattern: 'solid' },
-            royal: { name: '👑 Królewski', color: '#6600cc', price: 500, pattern: 'solid' },
-            galaxy: { name: '✨ Galaktyczny', color: '#aa00ff', price: 500, pattern: 'solid' }
+            plasma: { name: '⚡ Plasma', color: '#8800ff', price: 350, pattern: 'solid' },
+            cosmic: { name: '🌌 Cosmic', color: '#4a0080', price: 350, pattern: 'solid' },
+            ghost: { name: '👻 Ghost', color: '#88ffff', price: 400, pattern: 'solid' },
+            inferno: { name: '🌋 Inferno', color: '#ff3300', price: 400, pattern: 'solid' },
+            emerald: { name: '💚 Emerald', color: '#00cc66', price: 450, pattern: 'solid' },
+            royal: { name: '👑 Royal', color: '#6600cc', price: 500, pattern: 'solid' },
+            galaxy: { name: '✨ Galactic', color: '#aa00ff', price: 500, pattern: 'solid' }
         };
 
         const backgroundThemes = {
             default: {
-                name: '🌌 Głęboka Przestrzeń',
+                name: '🌌 Deep Space',
                 background: '#0a0a1a',
                 gridColor: '#1a1a3a',
                 wallColor: '#444466',
                 wallDetail: '#555577',
                 price: 0,
-                description: 'Klasyczna czarna przestrzeń'
+                description: 'Classic black space'
             },
             nebula: {
-                name: '🌠 Mgławica',
+                name: '🌠 Nebula',
                 background: '#1a0a2e',
                 gridColor: '#3a1a5e',
                 wallColor: '#6a3a9e',
                 wallDetail: '#8a5ade',
                 price: 150,
-                description: 'Fioletowa mgławica'
+                description: 'Purple nebula'
             },
             mars: {
                 name: '🔴 Mars',
@@ -910,70 +910,70 @@
                 wallColor: '#aa5a4a',
                 wallDetail: '#da8a7a',
                 price: 150,
-                description: 'Czerwona planeta'
+                description: 'Red planet'
             },
             ice: {
-                name: '❄️ Lodowa Planeta',
+                name: '❄️ Ice Planet',
                 background: '#0a2a3a',
                 gridColor: '#1a4a6a',
                 wallColor: '#2a6a9a',
                 wallDetail: '#4a9aca',
                 price: 200,
-                description: 'Zamarznięty świat'
+                description: 'Frozen world'
             },
             alien: {
-                name: '👽 Obca Planeta',
+                name: '👽 Alien Planet',
                 background: '#0a2a1a',
                 gridColor: '#1a4a3a',
                 wallColor: '#2a6a5a',
                 wallDetail: '#4a9a8a',
                 price: 200,
-                description: 'Zielona obca planeta'
+                description: 'Green alien planet'
             },
             neon: {
-                name: '🌃 Neon Kosmos',
+                name: '🌃 Neon Cosmos',
                 background: '#0a0e27',
                 gridColor: '#1a2aff',
                 wallColor: '#ff00ff',
                 wallDetail: '#00ffff',
                 price: 250,
-                description: 'Cyberpunk w kosmosie'
+                description: 'Cyberpunk in space'
             },
             void: {
-                name: '🕳️ Czarna Dziura',
+                name: '🕳️ Black Hole',
                 background: '#000000',
                 gridColor: '#1a001a',
                 wallColor: '#3a003a',
                 wallDetail: '#5a005a',
                 price: 300,
-                description: 'Absolutna ciemność'
+                description: 'Absolute darkness'
             },
             solar: {
-                name: '☀️ Korona Słoneczna',
+                name: '☀️ Solar Corona',
                 background: '#3a2a0a',
                 gridColor: '#6a5a2a',
                 wallColor: '#aa8a4a',
                 wallDetail: '#daba7a',
                 price: 300,
-                description: 'Gorąca plazma słoneczna'
+                description: 'Hot solar plasma'
             },
             galaxy: {
-                name: '🌀 Galaktyka',
+                name: '🌀 Galaxy',
                 background: '#1a1a3a',
                 gridColor: '#3a3a6a',
                 wallColor: '#5a5a9a',
                 wallDetail: '#8a8aca',
                 price: 350,
-                description: 'Spiralna galaktyka'
+                description: 'Spiral galaxy'
             },
             wormhole: {
-                name: '🌪️ Tunel Czasoprzestrzenny',
+                name: '🌪️ Spacetime Tunnel',
                 background: '#0a1a2a',
                 gridColor: '#2a4a6a',
                 wallColor: '#4a7aaa',
                 wallDetail: '#6aaaee',
                 price: 400,
-                description: 'Zakrzywiona przestrzeń'
+                description: 'Curved space'
             }
         };
 
@@ -1363,7 +1363,7 @@
                             name: entry.player_name,
                             score: entry.score,
                             mode: entry.game_mode,
-                            date: new Date(entry.play_date).toLocaleDateString('pl-PL')
+                            date: new Date(entry.play_date).toLocaleDateString('en-US')
                         }));
 
                         // Update localStorage cache for offline access
@@ -1406,7 +1406,7 @@
                 name: name || 'Anonim',
                 score: score,
                 mode: mode,
-                date: new Date().toLocaleDateString('pl-PL')
+                date: new Date().toLocaleDateString('en-US')
             };
 
             // Add to local array immediately (optimistic UI update)
@@ -1453,7 +1453,7 @@
 
             // Show loading state
             const container = document.getElementById('leaderboardEntries');
-            container.innerHTML = '<p style="color: #8af3ff; padding: 30px;">📡 Ładowanie tablicy wyników...</p>';
+            container.innerHTML = '<p style="color: #8af3ff; padding: 30px;">📡 Loading leaderboard...</p>';
 
             // Load latest data from Supabase
             await loadLeaderboard();
@@ -1472,7 +1472,7 @@
             container.innerHTML = '';
 
             if (leaderboard.length === 0) {
-                container.innerHTML = '<p style="color: #8af3ff; padding: 30px;">Brak wyników. Bądź pierwszy!</p>';
+                container.innerHTML = '<p style="color: #8af3ff; padding: 30px;">No scores. Be first!</p>';
                 return;
             }
 
@@ -1507,12 +1507,12 @@
             if (supabaseAvailable && leaderboard.length > 0) {
                 const globalIndicator = document.createElement('p');
                 globalIndicator.style.cssText = 'color: #ffd700; margin-top: 20px; font-size: 0.9em; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);';
-                globalIndicator.innerHTML = `🌍 Globalna tablica wyników - wyświetlono ${displayEntries.length} z ${leaderboard.length} najlepszych graczy`;
+                globalIndicator.innerHTML = `🌍 Global leaderboard - showing ${displayEntries.length} of ${leaderboard.length} top players`;
                 container.appendChild(globalIndicator);
             } else if (!supabaseAvailable) {
                 const offlineIndicator = document.createElement('p');
                 offlineIndicator.style.cssText = 'color: #ff8a80; margin-top: 20px; font-size: 0.9em;';
-                offlineIndicator.innerHTML = `📦 Tryb offline - lokalna tablica wyników`;
+                offlineIndicator.innerHTML = `📦 Offline mode - local leaderboard`;
                 container.appendChild(offlineIndicator);
             }
         }
@@ -1572,7 +1572,7 @@
         }
 
         function backToMenu() {
-            showConfirmModal('Czy na pewno chcesz wrócić do menu głównego?', () => {
+            showConfirmModal('Are you sure you want to return to main menu?', () => {
                 // Stop and reset background music
                 const backgroundMusic = document.getElementById('backgroundMusic');
                 if (backgroundMusic) {
@@ -1597,7 +1597,7 @@
                 backgroundMusic.pause();
             }
 
-            showConfirmModal('Czy na pewno chcesz wrócić do menu? Utracisz postęp!', () => {
+            showConfirmModal('Are you sure you want to return to menu? You will lose progress!', () => {
                 // Jeśli TAK - zakończ grę
                 gameRunning = false;
                 gamePaused = false;
@@ -1652,7 +1652,7 @@
 
                 const price = document.createElement('div');
                 price.className = 'skin-price';
-                price.textContent = owned ? '✓ Posiadany' : `💰 ${skin.price}`;
+                price.textContent = owned ? '✓ Owned' : `💰 ${skin.price}`;
 
                 card.appendChild(preview);
                 card.appendChild(name);
@@ -1661,14 +1661,14 @@
                 if (!owned && skin.price > 0) {
                     const buyBtn = document.createElement('button');
                     buyBtn.className = 'buy-btn';
-                    buyBtn.textContent = 'KUP';
+                    buyBtn.textContent = 'BUY';
                     buyBtn.disabled = totalCoins < skin.price;
                     buyBtn.onclick = () => buySkin(id);
                     card.appendChild(buyBtn);
                 } else if (owned && !selected) {
                     const selectBtn = document.createElement('button');
                     selectBtn.className = 'select-btn';
-                    selectBtn.textContent = 'WYBIERZ';
+                    selectBtn.textContent = 'SELECT';
                     selectBtn.onclick = () => selectSkin(id);
                     card.appendChild(selectBtn);
                 } else if (selected) {
@@ -1676,7 +1676,7 @@
                     selectedText.style.color = '#667eea';
                     selectedText.style.fontWeight = 'bold';
                     selectedText.style.marginTop = '10px';
-                    selectedText.textContent = '✓ WYBRANY';
+                    selectedText.textContent = '✓ SELECTED';
                     card.appendChild(selectedText);
                 }
 
@@ -1733,7 +1733,7 @@
 
                 const price = document.createElement('div');
                 price.className = 'skin-price';
-                price.textContent = owned ? '✓ Posiadane' : `💰 ${theme.price}`;
+                price.textContent = owned ? '✓ Owned' : `💰 ${theme.price}`;
 
                 card.appendChild(preview);
                 card.appendChild(name);
@@ -1743,14 +1743,14 @@
                 if (!owned && theme.price > 0) {
                     const buyBtn = document.createElement('button');
                     buyBtn.className = 'buy-btn';
-                    buyBtn.textContent = 'KUP';
+                    buyBtn.textContent = 'BUY';
                     buyBtn.disabled = totalCoins < theme.price;
                     buyBtn.onclick = () => buyTheme(id);
                     card.appendChild(buyBtn);
                 } else if (owned && !selected) {
                     const selectBtn = document.createElement('button');
                     selectBtn.className = 'select-btn';
-                    selectBtn.textContent = 'WYBIERZ';
+                    selectBtn.textContent = 'SELECT';
                     selectBtn.onclick = () => selectTheme(id);
                     card.appendChild(selectBtn);
                 } else if (selected) {
@@ -1993,8 +1993,8 @@
                 document.getElementById('player1Info').querySelector('div').innerHTML = 'Solo <span id="lives1">❤️</span>';
             } else {
                 document.getElementById('player2Info').style.display = 'flex';
-                document.getElementById('player1Info').querySelector('div').innerHTML = 'Gracz 1 <span id="lives1">❤️❤️❤️</span>';
-                document.getElementById('player2Info').querySelector('div').innerHTML = 'Gracz 2 <span id="lives2">❤️❤️❤️</span>';
+                document.getElementById('player1Info').querySelector('div').innerHTML = 'Player 1 <span id="lives1">❤️❤️❤️</span>';
+                document.getElementById('player2Info').querySelector('div').innerHTML = 'Player 2 <span id="lives2">❤️❤️❤️</span>';
             }
 
             updateLivesDisplay();
@@ -2010,7 +2010,7 @@
         }
 
         function restartGame() {
-            showConfirmModal('Czy na pewno chcesz rozpocząć nową grę?', () => {
+            showConfirmModal('Are you sure you want to start a new game?', () => {
                 document.getElementById('gameOver').style.display = 'none';
                 startGame();
             });
@@ -2804,7 +2804,7 @@
                 const soloHighScore = parseInt(localStorage.getItem('snakeSoloHighScore') || '0');
                 if (snake1.score > soloHighScore) {
                     localStorage.setItem('snakeSoloHighScore', snake1.score.toString());
-                    winnerText += ' 🎉 NOWY REKORD! 🎉';
+                    winnerText += ' 🎉 NEW RECORD! 🎉';
                 }
 
                 document.getElementById('finalScore1').textContent = snake1.score;
@@ -2819,33 +2819,33 @@
                 if (gameMode === 'bot') {
                     // Bot mode - specific messages for bot
                     if (snake1.alive && !snake2.alive) {
-                        winnerText = '🎉 Wygrałeś! Bot pokonany! 🎉';
+                        winnerText = '🎉 You Won! Bot Defeated! 🎉';
                     } else if (snake2.alive && !snake1.alive) {
-                        winnerText = '💔 Bot wygrał! Spróbuj ponownie! 💔';
+                        winnerText = '💔 Bot Won! Try Again! 💔';
                     } else if (!snake1.alive && !snake2.alive) {
                         // Both died, check who has more points
                         if (snake1.score > snake2.score) {
-                            winnerText = '🎉 Wygrałeś na punkty! 🎉';
+                            winnerText = '🎉 You Won on Points! 🎉';
                         } else if (snake2.score > snake1.score) {
-                            winnerText = '💔 Bot wygrał na punkty! 💔';
+                            winnerText = '💔 Bot Won on Points! 💔';
                         } else {
-                            winnerText = '🤝 Remis! 🤝';
+                            winnerText = '🤝 Draw! 🤝';
                         }
                     }
                 } else {
                     // Multiplayer mode
                     if (snake1.alive && !snake2.alive) {
-                        winnerText = '🏆 Wygrywa Gracz 1! 🏆';
+                        winnerText = '🏆 Player 1 Wins! 🏆';
                     } else if (snake2.alive && !snake1.alive) {
-                        winnerText = '🏆 Wygrywa Gracz 2! 🏆';
+                        winnerText = '🏆 Player 2 Wins! 🏆';
                     } else if (!snake1.alive && !snake2.alive) {
                         // Both died, check who has more points
                         if (snake1.score > snake2.score) {
-                            winnerText = '🏆 Wygrywa Gracz 1! (Więcej punktów) 🏆';
+                            winnerText = '🏆 Player 1 Wins! (More Points) 🏆';
                         } else if (snake2.score > snake1.score) {
-                            winnerText = '🏆 Wygrywa Gracz 2! (Więcej punktów) 🏆';
+                            winnerText = '🏆 Player 2 Wins! (More Points) 🏆';
                         } else {
-                            winnerText = '🤝 Remis! 🤝';
+                            winnerText = '🤝 Draw! 🤝';
                         }
                     }
                 }
@@ -2853,7 +2853,7 @@
                 // Check high score for multiplayer
                 if (totalScore > highScore) {
                     highScore = totalScore;
-                    winnerText += ' 🎉 NOWY REKORD! 🎉';
+                    winnerText += ' 🎉 NEW RECORD! 🎉';
                 }
 
                 document.getElementById('finalScore1').textContent = snake1.score;
