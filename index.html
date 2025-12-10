@@ -936,8 +936,9 @@
                     Mode:</label>
                 <select id="gameModeSelect"
                     style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
+                    <option value="solo">Solo Run</option>
+                    <option value="boss">Boss Rush (NEW!)</option>
                     <option value="multiplayer" selected>2 Players</option>
-                    <option value="solo">Solo</option>
                 </select>
             </div>
 
@@ -2847,6 +2848,18 @@
             currentDifficulty = document.getElementById('difficultySelect').value;
             distanceTraveled = 0;
 
+            // Set Boss Spawn Distance
+            if (gameMode === 'boss') {
+                distToBoss = 500; // Start almost immediately
+                bossActive = false; // Reset to ensure it spawns fresh
+                // Create a clean boss instance
+                boss = new Boss();
+            } else {
+                distToBoss = 2000;
+                bossActive = false;
+                boss = new Boss();
+            }
+
             // Camera delay setup
             gameStartTime = Date.now();
             cameraStarted = false;
@@ -3759,7 +3772,7 @@
             }
 
             // End game conditions
-            if (gameMode === 'solo') {
+            if (gameMode === 'solo' || gameMode === 'boss') {
                 if (!snake1.alive) {
                     endGame();
                     return;
@@ -3792,8 +3805,8 @@
             let winnerText = '';
             let earnedCoins = 0;
 
-            if (gameMode === 'solo') {
-                // Solo mode
+            if (gameMode === 'solo' || gameMode === 'boss') {
+                // Solo / Boss mode
                 earnedCoins = Math.floor(snake1.score / 10);
                 totalCoins += earnedCoins;
 
