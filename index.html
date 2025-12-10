@@ -1535,36 +1535,54 @@
 
         class Boss {
             constructor() {
-                this.width = 150;
-                this.height = 150;
-                this.x = canvasWidth + 200; // Start off-screen right (relative to camera, actually needs abs coord)
+                this.width = 200;
+                this.height = 100;
+                this.x = canvasWidth + 200;
                 this.y = canvasHeight / 2;
                 this.hp = 100;
                 this.maxHp = 100;
-                this.state = 'entering'; // entering, idle, attack
-                this.enterTargetX = 0; // Will be set relative to camera
+                this.state = 'entering';
+                this.enterTargetX = 0;
                 this.moveTimer = 0;
                 this.offsetY = 0;
+
+                // Snake Boss specific properties
+                this.segments = [];
+                const segmentCount = 12;
+                for (let i = 0; i < segmentCount; i++) {
+                    this.segments.push({
+                        x: this.x + i * 40,
+                        y: this.y,
+                        offset: i * 0.5
+                    });
+                }
             }
 
             spawn(cameraX) {
-                this.x = cameraX + canvasWidth + 100;
-                this.enterTargetX = cameraX + canvasWidth - 250;
+                this.x = cameraX + canvasWidth + 200;
+                this.enterTargetX = cameraX + canvasWidth - 300;
                 this.state = 'entering';
                 this.hp = 100;
                 bossActive = true;
 
+                // Re-init segments
+                for (let i = 0; i < this.segments.length; i++) {
+                    this.segments[i].x = this.x + i * 40;
+                    this.segments[i].y = this.y;
+                }
+
                 // Notification
                 const msg = document.createElement('div');
-                msg.textContent = "WARNING: BOSS APPROACHING!";
+                msg.textContent = "WARNING: SPACE SERPENT!";
                 msg.style.position = "fixed";
                 msg.style.top = "20%";
                 msg.style.left = "50%";
                 msg.style.transform = "translate(-50%, -50%)";
-                msg.style.color = "red";
-                msg.style.fontSize = "40px";
+                msg.style.color = "#00ff00";
+                msg.style.fontFamily = "Courier New, monospace";
+                msg.style.fontSize = "50px";
                 msg.style.fontWeight = "bold";
-                msg.style.textShadow = "0 0 20px red";
+                msg.style.textShadow = "0 0 20px #00ff00";
                 msg.style.zIndex = "2000";
                 msg.id = "bossWarning";
                 document.body.appendChild(msg);
@@ -1576,77 +1594,114 @@
             }
 
             update(cameraX) {
+                this.moveTimer += 0.05;
+
                 if (this.state === 'entering') {
-                    // Fly in from right
                     if (this.x > this.enterTargetX) {
-                        this.x -= 5;
+                        this.x -= 4;
                     } else {
                         this.state = 'idle';
                     }
                 } else if (this.state === 'idle') {
-                    // Hover up and down
-                    this.moveTimer += 0.03;
-                    this.y = (canvasHeight / 2) + Math.sin(this.moveTimer) * 150;
+                    // Head movement (Sine wave up/down)
+                    this.y = (canvasHeight / 2) + Math.sin(this.moveTimer) * 120;
+                    this.x = cameraX + canvasWidth - 300 + Math.cos(this.moveTimer * 0.7) * 50;
+                }
 
-                    // Keep horizontal position relative to camera
-                    this.x = cameraX + canvasWidth - 250;
+                // Update segments to follow head (Sine wave body)
+                for (let i = 0; i < this.segments.length; i++) {
+                    const seg = this.segments[i];
+                    // Wave motion for body
+                    const wave = Math.sin(this.moveTimer - i * 0.5) * 60;
+
+                    const screenHeadX = this.x;
+                    const targetX = screenHeadX + (i + 1) * 35;
+                    const targetY = this.y + wave;
+
+                    seg.x = targetX;
+                    seg.y = targetY;
                 }
             }
 
             draw(ctx, cameraOffset) {
                 const screenX = this.x - cameraOffset;
 
-                // Draw Boss Body (Complex Shape)
+                // Draw HP Bar
+                const barWidth = 150;
+                const barHeight = 15;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(screenX - 75, this.y - 120, barWidth, barHeight);
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(screenX - 75, this.y - 120, barWidth * (this.hp / this.maxHp), barHeight);
+                ctx.strokeStyle = '#fff';
+                ctx.strokeRect(screenX - 75, this.y - 120, barWidth, barHeight);
+
+                // Draw Segments first (background to head)
+                for (let i = this.segments.length - 1; i >= 0; i--) {
+                    const seg = this.segments[i];
+                    const segScreenX = seg.x - cameraOffset;
+
+                    ctx.save();
+                    ctx.translate(segScreenX, seg.y);
+
+                    // Segment Body
+                    ctx.fillStyle = i % 2 === 0 ? '#00aa00' : '#008800';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 25 - i, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Spikes
+                    ctx.fillStyle = '#555';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -25);
+                    ctx.lineTo(10, -35);
+                    ctx.lineTo(-10, -35);
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, 25);
+                    ctx.lineTo(10, 35);
+                    ctx.lineTo(-10, 35);
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+
+                // Draw Head
                 ctx.save();
                 ctx.translate(screenX, this.y);
 
-                // Glow
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = '#ff0000';
-
-                // Main Hull
-                ctx.fillStyle = '#440000';
+                // Head shape
+                ctx.fillStyle = '#00cc00';
                 ctx.beginPath();
-                ctx.moveTo(0, -60);
-                ctx.lineTo(70, -30);
-                ctx.lineTo(70, 30);
-                ctx.lineTo(0, 60);
-                ctx.lineTo(-50, 30);
-                ctx.lineTo(-50, -30);
-                ctx.closePath();
+                ctx.ellipse(0, 0, 50, 40, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Cockpit / Eye
+                // Eyes
                 ctx.fillStyle = '#ff0000';
                 ctx.beginPath();
-                ctx.arc(10, 0, 20, 0, Math.PI * 2);
+                ctx.arc(-20, -15, 8, 0, Math.PI * 2);
+                ctx.arc(-20, 15, 8, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Engine Thrusters
-                ctx.fillStyle = '#ffaa00';
-                if (Math.random() < 0.5) {
-                    ctx.beginPath();
-                    ctx.moveTo(70, -20);
-                    ctx.lineTo(100 + Math.random() * 20, -20);
-                    ctx.lineTo(70, -10);
-                    ctx.fill();
+                // Glowing Eyes
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(-20, -15, 8, 0, Math.PI * 2);
+                ctx.arc(-20, 15, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
 
-                    ctx.beginPath();
-                    ctx.moveTo(70, 20);
-                    ctx.lineTo(100 + Math.random() * 20, 20);
-                    ctx.lineTo(70, 10);
-                    ctx.fill();
-                }
+                // Teeth
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.moveTo(-40, -10);
+                ctx.lineTo(-30, 0);
+                ctx.lineTo(-40, 10);
+                ctx.fill();
 
                 ctx.restore();
-
-                // Draw HP Bar
-                const barWidth = 100;
-                const barHeight = 10;
-                ctx.fillStyle = '#333';
-                ctx.fillRect(screenX - 50, this.y - 80, barWidth, barHeight);
-                ctx.fillStyle = '#ff0000';
-                ctx.fillRect(screenX - 50, this.y - 80, barWidth * (this.hp / this.maxHp), barHeight);
             }
         }
 
