@@ -3312,6 +3312,11 @@
                 boss.draw(ctx, cameraOffset);
             }
 
+            // Draw Damage Texts
+            for (let dt of damageTexts) {
+                dt.draw(ctx, cameraOffset);
+            }
+
             // Draw Ammo UI
             if (bossActive || distanceTraveled > distToBoss - 500) { // Show when near boss
                 ctx.save();
