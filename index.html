@@ -624,63 +624,50 @@
             #startScreen h2 { font-size: 1.5em; }
         }
 
-        /* Touch controls styling */
-        #touchControls {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            display: none;
-        }
 
-        .dpad-container {
-            display: grid;
-            grid-template-columns: 60px 60px 60px;
-            grid-template-rows: 60px 60px 60px;
-            gap: 5px;
-        }
-
-        .dpad-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            background: rgba(138, 243, 255, 0.4);
-            border: 2px solid rgba(138, 243, 255, 0.6);
+        /* Mode selection buttons */
+        .mode-btn {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%);
             color: #8af3ff;
-            font-size: 24px;
+            border: 2px solid rgba(138, 243, 255, 0.3);
+            padding: 20px 50px;
+            font-size: 1.5em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             font-weight: bold;
-            touch-action: manipulation;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 10px;
+            display: inline-block;
+            min-width: 280px;
+            box-shadow: 0 0 15px rgba(138, 243, 255, 0.2);
+            text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);
         }
 
-        .dpad-btn:active {
-            background: rgba(138, 243, 255, 0.7);
-            transform: scale(0.95);
+        .mode-btn span {
+            display: block;
+            font-size: 0.5em;
+            margin-top: 5px;
+            opacity: 0.8;
         }
 
-        .dpad-up { grid-column: 2; grid-row: 1; }
-        .dpad-left { grid-column: 1; grid-row: 2; }
-        .dpad-right { grid-column: 3; grid-row: 2; }
-        .dpad-down { grid-column: 2; grid-row: 3; }
-        .dpad-center { grid-column: 2; grid-row: 2; background: transparent; border: none; }
-
-        /* Mobile play button */
-        .mobile-only {
-            display: none;
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(138, 243, 255, 0.5);
+            border-color: rgba(138, 243, 255, 0.7);
         }
 
-        @media (pointer: coarse) {
-            .mobile-only {
-                display: inline-block;
-            }
-            .desktop-only {
-                display: none;
-            }
+        .mode-btn.selected {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-color: rgba(240, 147, 251, 0.8);
+            box-shadow: 0 0 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .desktop-mode-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 201, 255, 0.6) 0%, rgba(146, 254, 157, 0.6) 100%);
+        }
+
+        .mobile-mode-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 201, 255, 0.6) 0%, rgba(146, 254, 157, 0.6) 100%);
         }
 
         /* Exit button for mobile */
@@ -725,9 +712,146 @@
             transform: translateX(-50%);
         }
 
-        :fullscreen #touchControls {
-            bottom: 10px;
-            left: 10px;
+        /* Virtual Joystick Styling */
+        #virtualJoystick {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: none;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .joystick-base {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(138, 243, 255, 0.08) 0%, rgba(138, 243, 255, 0.03) 100%);
+            border: 2px solid rgba(138, 243, 255, 0.15);
+            box-shadow: 0 0 20px rgba(138, 243, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .joystick-knob {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(138, 243, 255, 0.25), rgba(138, 243, 255, 0.12));
+            border: 2px solid rgba(138, 243, 255, 0.25);
+            box-shadow: 0 0 15px rgba(138, 243, 255, 0.1);
+            transition: all 0.1s ease-out;
+            will-change: transform;
+        }
+
+        .joystick-base.active {
+            background: radial-gradient(circle at center, rgba(138, 243, 255, 0.15) 0%, rgba(138, 243, 255, 0.05) 100%);
+            border-color: rgba(138, 243, 255, 0.25);
+            box-shadow: 0 0 30px rgba(138, 243, 255, 0.1);
+        }
+
+        .joystick-knob.active {
+            background: radial-gradient(circle at 30% 30%, rgba(138, 243, 255, 0.4), rgba(138, 243, 255, 0.2));
+            border-color: rgba(138, 243, 255, 0.4);
+        }
+
+        /* Mobile Score Overlay */
+        .mobile-score-overlay {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 999;
+            pointer-events: none;
+            display: none;
+        }
+
+        :fullscreen.mobile-fullscreen-mode .mobile-score-overlay {
+            display: block;
+        }
+
+        .overlay-player-info {
+            background: linear-gradient(135deg, rgba(26, 26, 62, 0.85) 0%, rgba(42, 42, 94, 0.85) 100%);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(138, 243, 255, 0.25);
+            border-radius: 12px;
+            padding: 10px 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 100px;
+        }
+
+        .overlay-lives {
+            font-size: 1.2em;
+            text-align: center;
+            color: #ff4d94;
+            text-shadow: 0 0 5px rgba(255, 77, 148, 0.5);
+        }
+
+        .overlay-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #8af3ff;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(138, 243, 255, 0.6);
+        }
+
+        .overlay-score::before {
+            content: '⭐ ';
+            font-size: 0.8em;
+        }
+
+        /* Mobile fullscreen - true 100% screen */
+        :fullscreen.mobile-fullscreen-mode #canvas {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            border: none;
+            border-radius: 0;
+        }
+
+        :fullscreen.mobile-fullscreen-mode #gameContainer {
+            padding: 0;
+            border: none;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        :fullscreen.mobile-fullscreen-mode .controls {
+            display: none;
+        }
+
+        :fullscreen.mobile-fullscreen-mode h1 {
+            display: none;
+        }
+
+        :fullscreen.mobile-fullscreen-mode #virtualJoystick {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        /* Responsive joystick for smaller screens */
+        @media (max-width: 640px) {
+            #virtualJoystick {
+                bottom: 15px;
+                left: 15px;
+            }
+            .joystick-base {
+                width: 100px;
+                height: 100px;
+            }
+            .joystick-knob {
+                width: 42px;
+                height: 42px;
+            }
         }
     </style>
 </head>
@@ -737,53 +861,66 @@
         <h2>🛸 UFO RACE 🛸</h2>
         <div class="coin-display">💰 Coins: <span id="totalCoins">0</span></div>
 
-        <div style="margin: 20px 0;">
-            <label
-                style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Game
-                Mode:</label>
-            <select id="gameModeSelect"
-                style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
-                <option value="multiplayer" selected>2 Players</option>
-                <option value="solo">Solo</option>
-            </select>
-        </div>
-
-        <div style="margin: 20px 0;">
-            <label
-                style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Difficulty:</label>
-            <select id="difficultySelect"
-                style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
-                <option value="easy">Easy</option>
-                <option value="normal" selected>Normal</option>
-                <option value="hard">Hard</option>
-                <option value="very-difficult">Very Hard</option>
-            </select>
-        </div>
-
-        <div style="margin: 20px 0;">
-            <button type="button" id="muteToggle" class="mute-btn">
-                <span class="mute-icon">🔊</span>
-                <span class="mute-text">Music</span>
+        <div id="modeSelection" style="margin: 30px 0;">
+            <h3 style="color: #8af3ff; margin-bottom: 15px; font-size: 1.5em; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Select Control Mode:</h3>
+            <button class="mode-btn desktop-mode-btn" onclick="selectDesktopMode()">
+                🖥️ DESKTOP MODE
+                <span>Keyboard Controls</span>
+            </button>
+            <button class="mode-btn mobile-mode-btn" onclick="selectMobileMode()">
+                📱 MOBILE MODE
+                <span>Touch Joystick</span>
             </button>
         </div>
 
-        <button class="start-btn desktop-only" onclick="startGame()">START GAME!</button>
-        <button class="start-btn mobile-only" onclick="startMobileGame()" style="background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%);">📱 PLAY FULLSCREEN</button>
-        <button class="shop-btn" onclick="openShop()">🛒 SHOP</button>
-        <button class="leaderboard-btn" onclick="openLeaderboard()">🏆 HIGH SCORES</button>
-        <button class="desktop-only" onclick="toggleFullscreen()"
-            style="background: linear-gradient(135deg, rgba(0, 201, 255, 0.5) 0%, rgba(146, 254, 157, 0.5) 100%); border-color: rgba(0, 201, 255, 0.5);">🖥️
-            FULLSCREEN</button>
-        <div class="controls-preview">
-            <h3>How to Play (2 Players):</h3>
-            <p><strong>🎮 Player 1 (Pink):</strong> W A S D</p>
-            <p><strong>🎮 Player 2 (Blue):</strong> Arrows ↑ ← ↓ →</p>
-            <p>🛸 UFOs move in the direction of the last key pressed!</p>
-            <p>💎 Collect energy crystals to gain points</p>
-            <p>⚠️ Watch out for asteroids and don't fall off screen!</p>
-            <p>🏆 The pilot with more points wins!</p>
-            <p>💰 Both players' points convert to coins!</p>
-            <p><strong>⬅️ Exit:</strong> Press Q to return to menu</p>
+        <div id="gameOptions" style="display: none;">
+            <div style="margin: 20px 0;">
+                <label
+                    style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Game
+                    Mode:</label>
+                <select id="gameModeSelect"
+                    style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
+                    <option value="multiplayer" selected>2 Players</option>
+                    <option value="solo">Solo</option>
+                </select>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <label
+                    style="font-size: 1.3em; font-weight: bold; color: #8af3ff; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Difficulty:</label>
+                <select id="difficultySelect"
+                    style="font-size: 1.2em; padding: 10px; border-radius: 5px; margin-left: 10px; background: rgba(26, 26, 62, 0.7); color: #8af3ff; border: 2px solid rgba(138, 243, 255, 0.3);">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                    <option value="very-difficult">Very Hard</option>
+                </select>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button type="button" id="muteToggle" class="mute-btn">
+                    <span class="mute-icon">🔊</span>
+                    <span class="mute-text">Music</span>
+                </button>
+            </div>
+
+            <button id="startGameBtn" class="start-btn" onclick="initiateGame()">START GAME!</button>
+            <button class="shop-btn" onclick="openShop()">🛒 SHOP</button>
+            <button class="leaderboard-btn" onclick="openLeaderboard()">🏆 HIGH SCORES</button>
+            <button id="desktopFullscreenBtn" style="display: none;" onclick="toggleFullscreen()"
+                style="background: linear-gradient(135deg, rgba(0, 201, 255, 0.5) 0%, rgba(146, 254, 157, 0.5) 100%); border-color: rgba(0, 201, 255, 0.5);">🖥️
+                FULLSCREEN</button>
+            <div class="controls-preview" id="controlsPreview">
+                <h3>How to Play (2 Players):</h3>
+                <p><strong>🎮 Player 1 (Pink):</strong> W A S D</p>
+                <p><strong>🎮 Player 2 (Blue):</strong> Arrows ↑ ← ↓ →</p>
+                <p>🛸 UFOs move in the direction of the last key pressed!</p>
+                <p>💎 Collect energy crystals to gain points</p>
+                <p>⚠️ Watch out for asteroids and don't fall off screen!</p>
+                <p>🏆 The pilot with more points wins!</p>
+                <p>💰 Both players' points convert to coins!</p>
+                <p><strong>⬅️ Exit:</strong> Press Q to return to menu</p>
+            </div>
         </div>
     </div>
 
@@ -842,14 +979,22 @@
         <button type="button" onclick="exitToMenu()" style="margin-top: 20px;">⬅️ Exit to Menu (Q)</button>
     </div>
 
-    <!-- Touch Controls for Mobile -->
-    <div id="touchControls">
-        <div class="dpad-container">
-            <button class="dpad-btn dpad-up" type="button">↑</button>
-            <button class="dpad-btn dpad-left" type="button">←</button>
-            <div class="dpad-center"></div>
-            <button class="dpad-btn dpad-right" type="button">→</button>
-            <button class="dpad-btn dpad-down" type="button">↓</button>
+    <!-- Virtual Joystick for Mobile -->
+    <div id="virtualJoystick">
+        <div id="joystickBase" class="joystick-base">
+            <div id="joystickKnob" class="joystick-knob"></div>
+        </div>
+    </div>
+
+    <!-- Mobile Score Overlay -->
+    <div id="mobileScoreOverlay" class="mobile-score-overlay">
+        <div class="overlay-player-info">
+            <div class="overlay-lives">
+                <span id="overlayLives">❤️❤️❤️</span>
+            </div>
+            <div class="overlay-score">
+                <span id="overlayScore">0</span>
+            </div>
         </div>
     </div>
 
@@ -917,42 +1062,169 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         let isMobileFullscreen = false;
 
-        // Setup touch controls if on mobile
-        function setupTouchControls() {
-            if (!isMobile) return;
+        // Control mode state
+        let controlMode = null; // 'desktop' or 'mobile'
+        let modeSelected = false;
 
-            const touchControls = document.getElementById('touchControls');
-            const directions = {
-                'dpad-up': { x: 0, y: -1 },
-                'dpad-down': { x: 0, y: 1 },
-                'dpad-left': { x: -1, y: 0 },
-                'dpad-right': { x: 1, y: 0 }
-            };
+        // Virtual joystick state
+        let joystickActive = false;
+        let joystickCenter = { x: 0, y: 0 };
+        let joystickMaxDistance = 35;
+        let joystickThreshold = 8;
+        let currentJoystickDirection = { x: 0, y: 0 };
 
-            Object.keys(directions).forEach(className => {
-                const btn = document.querySelector('.' + className);
-                if (btn) {
-                    // Touch start - set direction
-                    btn.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        if (gameRunning && typeof snake1 !== 'undefined') {
-                            snake1.nextDirection = directions[className];
-                        }
-                        btn.style.background = 'rgba(138, 243, 255, 0.8)';
-                    }, { passive: false });
+        // Mode selection functions
+        function selectDesktopMode() {
+            controlMode = 'desktop';
+            modeSelected = true;
 
-                    // Touch end - visual feedback
-                    btn.addEventListener('touchend', (e) => {
-                        e.preventDefault();
-                        btn.style.background = 'rgba(138, 243, 255, 0.4)';
-                    }, { passive: false });
-                }
-            });
+            // Update UI
+            document.querySelector('.desktop-mode-btn').classList.add('selected');
+            document.querySelector('.mobile-mode-btn').classList.remove('selected');
+            document.getElementById('gameOptions').style.display = 'block';
+
+            // Show desktop-specific options
+            document.getElementById('gameModeSelect').parentElement.style.display = 'block';
+            document.getElementById('controlsPreview').style.display = 'block';
+            document.getElementById('desktopFullscreenBtn').style.display = 'inline-block';
         }
 
-        // Start mobile game with fullscreen and landscape lock
-        async function startMobileGame() {
+        function selectMobileMode() {
+            controlMode = 'mobile';
+            modeSelected = true;
+
+            // Update UI
+            document.querySelector('.mobile-mode-btn').classList.add('selected');
+            document.querySelector('.desktop-mode-btn').classList.remove('selected');
+            document.getElementById('gameOptions').style.display = 'block';
+
+            // Force solo mode for mobile
+            document.getElementById('gameModeSelect').value = 'solo';
+            document.getElementById('gameModeSelect').parentElement.style.display = 'none';
+            document.getElementById('controlsPreview').style.display = 'none';
+            document.getElementById('desktopFullscreenBtn').style.display = 'none';
+        }
+
+        function initiateGame() {
+            if (!modeSelected) {
+                alert('Please select a control mode first!');
+                return;
+            }
+
+            if (controlMode === 'mobile') {
+                startMobileGameEnhanced();
+            } else {
+                startGame();
+            }
+        }
+
+        // Virtual joystick setup
+        function setupVirtualJoystick() {
+            const joystickBase = document.getElementById('joystickBase');
+            const joystickKnob = document.getElementById('joystickKnob');
+
+            if (!joystickBase || !joystickKnob) return;
+
+            // Get joystick center position
+            function getJoystickCenter() {
+                const rect = joystickBase.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2
+                };
+            }
+
+            // Update joystick direction from touch position
+            function updateJoystickDirection(touchX, touchY) {
+                const deltaX = touchX - joystickCenter.x;
+                const deltaY = touchY - joystickCenter.y;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                // Update visual position (clamped to max distance)
+                const clampedDistance = Math.min(distance, joystickMaxDistance);
+                const angle = Math.atan2(deltaY, deltaX);
+                const knobX = Math.cos(angle) * clampedDistance;
+                const knobY = Math.sin(angle) * clampedDistance;
+
+                joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+
+                // Only update direction if past threshold
+                if (distance > joystickThreshold) {
+                    // Normalize to unit vector
+                    const normalizedX = deltaX / distance;
+                    const normalizedY = deltaY / distance;
+
+                    // Convert to 4-directional input (dominant axis)
+                    if (Math.abs(normalizedX) > Math.abs(normalizedY)) {
+                        // Horizontal dominant
+                        currentJoystickDirection = {
+                            x: normalizedX > 0 ? 1 : -1,
+                            y: 0
+                        };
+                    } else {
+                        // Vertical dominant
+                        currentJoystickDirection = {
+                            x: 0,
+                            y: normalizedY > 0 ? 1 : -1
+                        };
+                    }
+
+                    // Update snake direction if game is running
+                    if (gameRunning && typeof snake1 !== 'undefined') {
+                        snake1.nextDirection = currentJoystickDirection;
+                    }
+                }
+            }
+
+            // Reset joystick to center
+            function resetJoystick() {
+                joystickKnob.style.transform = 'translate(0, 0)';
+                joystickBase.classList.remove('active');
+                joystickKnob.classList.remove('active');
+                currentJoystickDirection = { x: 0, y: 0 };
+                joystickActive = false;
+            }
+
+            // Touch start
+            joystickBase.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                joystickActive = true;
+                joystickCenter = getJoystickCenter();
+                joystickBase.classList.add('active');
+                joystickKnob.classList.add('active');
+
+                const touch = e.touches[0];
+                updateJoystickDirection(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            // Touch move
+            joystickBase.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!joystickActive) return;
+
+                const touch = e.touches[0];
+                updateJoystickDirection(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            // Touch end
+            joystickBase.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                resetJoystick();
+            }, { passive: false });
+
+            // Touch cancel
+            joystickBase.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                resetJoystick();
+            }, { passive: false });
+        }
+
+        // Start mobile game with enhanced fullscreen and joystick
+        async function startMobileGameEnhanced() {
             try {
+                // Add mobile fullscreen class to enable CSS
+                document.documentElement.classList.add('mobile-fullscreen-mode');
+
                 // Set to solo mode for mobile
                 document.getElementById('gameModeSelect').value = 'solo';
 
@@ -977,26 +1249,34 @@
 
                 isMobileFullscreen = true;
 
-                // Show touch controls and mobile exit button
-                document.getElementById('touchControls').style.display = 'block';
+                // Show virtual joystick and mobile exit button
+                document.getElementById('virtualJoystick').style.display = 'block';
                 document.getElementById('mobileExitBtn').style.display = 'block';
+
+                // Setup virtual joystick
+                setupVirtualJoystick();
 
                 // Start the game
                 startGame();
 
             } catch (err) {
                 console.log('Fullscreen error:', err);
-                // Fallback: start game without fullscreen
+                // Fallback: start game without fullscreen but with mobile class
+                document.documentElement.classList.add('mobile-fullscreen-mode');
                 document.getElementById('gameModeSelect').value = 'solo';
-                document.getElementById('touchControls').style.display = 'block';
+                document.getElementById('virtualJoystick').style.display = 'block';
+                setupVirtualJoystick();
                 startGame();
             }
         }
 
         // Exit mobile fullscreen game
         function exitMobileGame() {
-            // Hide touch controls
-            document.getElementById('touchControls').style.display = 'none';
+            // Remove mobile fullscreen class
+            document.documentElement.classList.remove('mobile-fullscreen-mode');
+
+            // Hide virtual joystick and overlay
+            document.getElementById('virtualJoystick').style.display = 'none';
             document.getElementById('mobileExitBtn').style.display = 'none';
 
             // Exit fullscreen
@@ -1027,7 +1307,8 @@
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                 // Exited fullscreen
                 if (isMobileFullscreen) {
-                    document.getElementById('touchControls').style.display = 'none';
+                    document.documentElement.classList.remove('mobile-fullscreen-mode');
+                    document.getElementById('virtualJoystick').style.display = 'none';
                     document.getElementById('mobileExitBtn').style.display = 'none';
                     if (screen.orientation && screen.orientation.unlock) {
                         screen.orientation.unlock();
@@ -1043,9 +1324,6 @@
                 e.preventDefault();
             }
         }, { passive: false });
-
-        // Initialize touch controls on page load
-        document.addEventListener('DOMContentLoaded', setupTouchControls);
         // ================================================================
 
         const canvas = document.getElementById('canvas');
@@ -1066,25 +1344,36 @@
         // Responsive canvas sizing for mobile
         function resizeCanvasDisplay() {
             const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-            const padding = isFullscreen ? 20 : 40;
-            const maxWidth = window.innerWidth - padding;
-            const maxHeight = window.innerHeight - (isFullscreen ? 120 : 200);
-            const aspectRatio = canvasWidth / canvasHeight; // 2:1
+            const isMobileMode = document.documentElement.classList.contains('mobile-fullscreen-mode');
 
-            let displayWidth = maxWidth;
-            let displayHeight = displayWidth / aspectRatio;
+            if (isFullscreen && isMobileMode) {
+                // Mobile fullscreen: true 100vw x 100vh
+                canvas.style.width = '100vw';
+                canvas.style.height = '100vh';
+                canvas.style.maxWidth = '100vw';
+                canvas.style.maxHeight = '100vh';
+            } else {
+                // Desktop fullscreen or normal mode: maintain aspect ratio with padding
+                const padding = isFullscreen ? 20 : 40;
+                const maxWidth = window.innerWidth - padding;
+                const maxHeight = window.innerHeight - (isFullscreen ? 120 : 200);
+                const aspectRatio = canvasWidth / canvasHeight; // 2:1
 
-            if (displayHeight > maxHeight) {
-                displayHeight = maxHeight;
-                displayWidth = displayHeight * aspectRatio;
+                let displayWidth = maxWidth;
+                let displayHeight = displayWidth / aspectRatio;
+
+                if (displayHeight > maxHeight) {
+                    displayHeight = maxHeight;
+                    displayWidth = displayHeight * aspectRatio;
+                }
+
+                // Apply constraints
+                displayWidth = Math.min(displayWidth, canvasWidth);
+                displayHeight = Math.min(displayHeight, canvasHeight);
+
+                canvas.style.width = displayWidth + 'px';
+                canvas.style.height = displayHeight + 'px';
             }
-
-            // Apply constraints
-            displayWidth = Math.min(displayWidth, canvasWidth);
-            displayHeight = Math.min(displayHeight, canvasHeight);
-
-            canvas.style.width = displayWidth + 'px';
-            canvas.style.height = displayHeight + 'px';
         }
 
         // Initial sizing
@@ -1877,6 +2166,16 @@
             }
         }
 
+        // Reset mode selection UI
+        function resetModeSelection() {
+            controlMode = null;
+            modeSelected = false;
+            document.querySelector('.desktop-mode-btn')?.classList.remove('selected');
+            document.querySelector('.mobile-mode-btn')?.classList.remove('selected');
+            document.getElementById('gameOptions').style.display = 'none';
+            document.getElementById('modeSelection').style.display = 'block';
+        }
+
         function backToMenu() {
             showConfirmModal('Are you sure you want to return to main menu?', () => {
                 // Stop and reset background music
@@ -1889,6 +2188,7 @@
                 document.getElementById('gameOver').style.display = 'none';
                 document.getElementById('gameContainer').style.display = 'none';
                 document.getElementById('startScreen').style.display = 'block';
+                resetModeSelection();
                 updateCoinDisplay();
             });
         }
@@ -1921,6 +2221,7 @@
 
                 // Show main menu
                 document.getElementById('startScreen').style.display = 'block';
+                resetModeSelection();
 
                 // Update coin display
                 updateCoinDisplay();
@@ -2107,6 +2408,24 @@
             if (gameMode === 'multiplayer') {
                 document.getElementById('lives2').textContent = hearts.repeat(snake2.lives);
             }
+            // Update mobile overlay if in mobile mode
+            updateMobileScoreOverlay();
+        }
+
+        // Update mobile score overlay
+        function updateMobileScoreOverlay() {
+            if (!document.documentElement.classList.contains('mobile-fullscreen-mode')) return;
+
+            const overlayScore = document.getElementById('overlayScore');
+            const overlayLives = document.getElementById('overlayLives');
+
+            if (overlayScore && snake1) {
+                overlayScore.textContent = snake1.score;
+            }
+
+            if (overlayLives && snake1) {
+                overlayLives.textContent = '❤️'.repeat(snake1.lives);
+            }
         }
 
         function makeInvulnerable(snake) {
@@ -2265,7 +2584,7 @@
             pathDirection = 0;
 
             // Set lives based on game mode
-            const livesCount = gameMode === 'solo' ? 1 : 3;
+            const livesCount = 3; // Always 3 lives, even in solo mode (User Request)
 
             snake1 = {
                 body: [{ x: 5, y: 10 }],
