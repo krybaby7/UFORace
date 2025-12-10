@@ -2939,9 +2939,9 @@
                 bossActive = false;
                 boss = new Boss();
             } else {
-                distToBoss = 500; // Reduced from 2000 for easier testing
+                distToBoss = 999999999; // Disable boss in other modes
                 bossActive = false;
-                boss = new Boss();
+                boss = null; // No boss object needed
             }
 
             // Camera delay setup
