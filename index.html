@@ -1473,15 +1473,45 @@
         // let distanceTraveled = 0; <-- REMOVED DUPLICATE
 
         // BOSS & ROCKET VARIABLES
-        let boss = null; // Will be an object when active
+        let boss = null;
         let playerAmmo = 5;
         let maxAmmo = 5;
         let lastRocketReload = 0;
-        let rockets = []; // Array of active rockets
+        let rockets = [];
         let mouseX = 0;
         let mouseY = 0;
         let bossActive = false;
-        let distToBoss = 2000; // Trigger boss after this distance (or test value)
+        let distToBoss = 500;
+
+        // VISUAL EFFECTS
+        let damageTexts = [];
+
+        class DamageText {
+            constructor(x, y, amount) {
+                this.x = x;
+                this.y = y;
+                this.amount = amount;
+                this.life = 1.0;
+                this.vy = -1;
+            }
+
+            update() {
+                this.y += this.vy;
+                this.life -= 0.02;
+            }
+
+            draw(ctx, cameraOffset) {
+                const screenX = this.x - cameraOffset;
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = '#ffcc00';
+                ctx.font = 'bold 30px Arial';
+                ctx.shadowColor = 'black';
+                ctx.shadowBlur = 4;
+                ctx.fillText(`-${this.amount}`, screenX, this.y);
+                ctx.restore();
+            }
+        }
 
         class Rocket {
             constructor(x, y, targetX, targetY) {
