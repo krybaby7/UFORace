@@ -2906,11 +2906,10 @@
             // Set Boss Spawn Distance
             if (gameMode === 'boss') {
                 distToBoss = 500; // Start almost immediately
-                bossActive = false; // Reset to ensure it spawns fresh
-                // Create a clean boss instance
+                bossActive = false;
                 boss = new Boss();
             } else {
-                distToBoss = 2000;
+                distToBoss = 500; // Reduced from 2000 for easier testing
                 bossActive = false;
                 boss = new Boss();
             }
