@@ -326,9 +326,17 @@
             font-size: 1.2em;
         }
 
-        .rank-col.gold { color: #ffd700; }
-        .rank-col.silver { color: #c0c0c0; }
-        .rank-col.bronze { color: #cd7f32; }
+        .rank-col.gold {
+            color: #ffd700;
+        }
+
+        .rank-col.silver {
+            color: #c0c0c0;
+        }
+
+        .rank-col.bronze {
+            color: #cd7f32;
+        }
 
         .name-col {
             text-align: left;
@@ -539,7 +547,7 @@
             padding: 40px 60px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(102, 126, 234, 0.5),
-                        0 0 40px rgba(138, 243, 255, 0.3);
+                0 0 40px rgba(138, 243, 255, 0.3);
             border: 2px solid rgba(138, 243, 255, 0.3);
             text-align: center;
             animation: modalFadeIn 0.3s ease-out;
@@ -550,6 +558,7 @@
                 opacity: 0;
                 transform: scale(0.8);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -606,22 +615,65 @@
 
         /* Mobile-specific styles */
         @media (max-width: 768px) {
-            #gameContainer { padding: 10px; }
-            h1 { font-size: 1.5em; }
-            .controls { flex-direction: column; gap: 10px; }
-            .player-info { min-width: 150px; font-size: 1em; padding: 10px; }
-            button { padding: 12px 20px; font-size: 1em; }
-            .controls-preview { display: none; }
-            #startScreen { padding: 20px; max-width: 95vw; }
-            #startScreen h2 { font-size: 2em; }
-            .coin-display { font-size: 1.5em; }
+            #gameContainer {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .player-info {
+                min-width: 150px;
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .controls-preview {
+                display: none;
+            }
+
+            #startScreen {
+                padding: 20px;
+                max-width: 95vw;
+            }
+
+            #startScreen h2 {
+                font-size: 2em;
+            }
+
+            .coin-display {
+                font-size: 1.5em;
+            }
         }
 
         @media (max-width: 480px) {
-            h1 { font-size: 1.2em; }
-            .player-info { min-width: 120px; }
-            button { padding: 10px 15px; font-size: 0.9em; }
-            #startScreen h2 { font-size: 1.5em; }
+            h1 {
+                font-size: 1.2em;
+            }
+
+            .player-info {
+                min-width: 120px;
+            }
+
+            button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+
+            #startScreen h2 {
+                font-size: 1.5em;
+            }
         }
 
 
@@ -844,10 +896,12 @@
                 bottom: 15px;
                 left: 15px;
             }
+
             .joystick-base {
                 width: 100px;
                 height: 100px;
             }
+
             .joystick-knob {
                 width: 42px;
                 height: 42px;
@@ -862,7 +916,9 @@
         <div class="coin-display">💰 Coins: <span id="totalCoins">0</span></div>
 
         <div id="modeSelection" style="margin: 30px 0;">
-            <h3 style="color: #8af3ff; margin-bottom: 15px; font-size: 1.5em; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">Select Control Mode:</h3>
+            <h3
+                style="color: #8af3ff; margin-bottom: 15px; font-size: 1.5em; text-shadow: 0 0 5px rgba(138, 243, 255, 0.5);">
+                Select Control Mode:</h3>
             <button class="mode-btn desktop-mode-btn" onclick="selectDesktopMode()">
                 🖥️ DESKTOP MODE
                 <span>Keyboard Controls</span>
@@ -1026,8 +1082,7 @@
             <h3>🏆 New Record!</h3>
             <p style="margin: 15px 0; color: #8af3ff;">Your score: <span id="newHighScore">0</span> points</p>
             <p style="margin-bottom: 15px; color: #92fe9d;">Enter your name:</p>
-            <input type="text" id="playerNameInput" maxlength="20" placeholder="Enter name..."
-                   style="padding: 10px; font-size: 1.2em; width: 250px; text-align: center;
+            <input type="text" id="playerNameInput" maxlength="20" placeholder="Enter name..." style="padding: 10px; font-size: 1.2em; width: 250px; text-align: center;
                           border: 2px solid #8af3ff; border-radius: 5px; background: #1a1a3e;
                           color: #8af3ff;">
             <div style="margin-top: 20px;">
@@ -2138,14 +2193,23 @@
         }
 
         // Handle Enter key in name input
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const nameInput = document.getElementById('playerNameInput');
             if (nameInput) {
-                nameInput.addEventListener('keypress', function(e) {
+                nameInput.addEventListener('keypress', function (e) {
                     if (e.key === 'Enter') {
                         saveHighScore();
                     }
                 });
+            }
+
+            // Auto-detect mobile and select mode, else desktop
+            if (isMobile) {
+                console.log("📱 Mobile device detected - auto-selecting mobile mode");
+                selectMobileMode();
+            } else {
+                console.log("🖥️ Desktop device detected - auto-selecting desktop mode");
+                selectDesktopMode();
             }
         });
 
@@ -3560,7 +3624,7 @@
         backgroundMusic.volume = 0.5;
 
         // Handle mute toggle
-        muteToggle.addEventListener('click', function() {
+        muteToggle.addEventListener('click', function () {
             backgroundMusic.muted = !backgroundMusic.muted;
             const muteIcon = this.querySelector('.mute-icon');
 
@@ -3574,7 +3638,7 @@
         });
 
         // Handle game mode change - show/hide bot difficulty selector
-        document.getElementById('gameModeSelect').addEventListener('change', function() {
+        document.getElementById('gameModeSelect').addEventListener('change', function () {
             const botDifficultyContainer = document.getElementById('botDifficultyContainer');
             if (this.value === 'bot') {
                 botDifficultyContainer.style.display = 'block';
