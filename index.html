@@ -1589,21 +1589,23 @@
             }
 
             spawn(cameraX) {
-                this.x = cameraX + canvasWidth + 200;
-                this.enterTargetX = cameraX + canvasWidth - 300;
-                this.state = 'entering';
+                // Determine spawn Y
+                this.y = canvasHeight / 2;
+                // Start on the LEFT side (behind camera view or just at edge)
+                this.x = cameraX - 400;
+                this.state = 'moving_right';
                 this.hp = 100;
                 bossActive = true;
 
-                // Re-init segments
+                // Re-init segments to trail behind (to the left)
                 for (let i = 0; i < this.segments.length; i++) {
-                    this.segments[i].x = this.x + i * 40;
+                    this.segments[i].x = this.x - i * 40;
                     this.segments[i].y = this.y;
                 }
 
                 // Notification
                 const msg = document.createElement('div');
-                msg.textContent = "WARNING: SPACE SERPENT!";
+                msg.textContent = "WARNING: GIANT SNAKE!";
                 msg.style.position = "fixed";
                 msg.style.top = "20%";
                 msg.style.left = "50%";
@@ -1626,26 +1628,27 @@
             update(cameraX) {
                 this.moveTimer += 0.05;
 
-                if (this.state === 'entering') {
-                    if (this.x > this.enterTargetX) {
-                        this.x -= 4;
-                    } else {
-                        this.state = 'idle';
-                    }
-                } else if (this.state === 'idle') {
-                    // Head movement (Sine wave up/down)
-                    this.y = (canvasHeight / 2) + Math.sin(this.moveTimer) * 120;
-                    this.x = cameraX + canvasWidth - 300 + Math.cos(this.moveTimer * 0.7) * 50;
+                // Move from Left to Right
+                // Speed must be faster than camera
+                const moveSpeed = 8;
+                this.x += moveSpeed;
+
+                // Sine wave movement (vertical)
+                this.y = (canvasHeight / 2) + Math.sin(this.moveTimer) * 200;
+
+                // Loop logic: If far right of camera, reset to far left
+                if (this.x > cameraX + canvasWidth + 500) {
+                    this.x = cameraX - 500;
                 }
 
-                // Update segments to follow head (Sine wave body)
+                // Update segments to follow head
                 for (let i = 0; i < this.segments.length; i++) {
                     const seg = this.segments[i];
-                    // Wave motion for body
-                    const wave = Math.sin(this.moveTimer - i * 0.5) * 60;
+                    // Wave motion
+                    const wave = Math.sin(this.moveTimer - i * 0.4) * 80;
 
-                    const screenHeadX = this.x;
-                    const targetX = screenHeadX + (i + 1) * 35;
+                    // Segments trail to the LEFT of the head
+                    const targetX = this.x - (i + 1) * 45;
                     const targetY = this.y + wave;
 
                     seg.x = targetX;
@@ -1700,6 +1703,7 @@
                 // Draw Head
                 ctx.save();
                 ctx.translate(screenX, this.y);
+                ctx.scale(-1, 1); // Flip horizontally to face RIGHT
 
                 // Head shape
                 ctx.fillStyle = '#00cc00';
@@ -2489,35 +2493,9 @@
             });
 
             // Shooting for Boss Battle
+            // Shooting for Boss Battle - DISABLED AS PER REQUEST
             document.addEventListener('mousedown', (e) => {
-                if (gameRunning && bossActive && !gamePaused) {
-                    const now = Date.now();
-                    if (playerAmmo > 0 && now - lastRocketReload > 500) { // Global cooldown 0.5s prevent instant spam
-                        // Fire rocket
-                        const rect = canvas.getBoundingClientRect();
-                        const targetX = (e.clientX - rect.left) / (rect.width / canvasWidth) + cameraOffset;
-                        const targetY = (e.clientY - rect.top) / (rect.height / canvasHeight);
-
-                        // Spawn rocket from player position
-                        // Try to find active player
-                        let sourceX = 0, sourceY = 0;
-                        if (snake1.alive) {
-                            const head = snake1.body[0];
-                            sourceX = head.x * GRID_SIZE + GRID_SIZE / 2;
-                            sourceY = head.y * GRID_SIZE + GRID_SIZE / 2;
-                        } else if (snake2.alive) {
-                            const head = snake2.body[0];
-                            sourceX = head.x * GRID_SIZE + GRID_SIZE / 2;
-                            sourceY = head.y * GRID_SIZE + GRID_SIZE / 2;
-                        } else {
-                            return;
-                        }
-
-                        rockets.push(new Rocket(sourceX, sourceY, targetX, targetY));
-                        playerAmmo--;
-                        // Play sound effect (optional/stub)
-                    }
-                }
+                // Shooting is disabled used to be here
             });
         });
 
@@ -2892,7 +2870,12 @@
                         maze[x][y] = 0;
                     } else {
                         // Outside tunnel - high chance of obstacles
-                        if (Math.random() < settings.obstacleDensity) {
+                        let density = settings.obstacleDensity;
+                        if (gameMode === 'boss') {
+                            density *= 0.3; // Significantly reduce obstacles in boss mode
+                        }
+
+                        if (Math.random() < density) {
                             maze[x][y] = 1;
                         }
                     }
