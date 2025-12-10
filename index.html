@@ -1467,7 +1467,190 @@
 
         // Difficulty settings
         let currentDifficulty = 'normal';
-        let distanceTraveled = 0;
+        // Difficulty settings
+        // let currentDifficulty = 'normal'; <-- REMOVED DUPLICATE
+        // let distanceTraveled = 0; <-- REMOVED DUPLICATE
+
+        // BOSS & ROCKET VARIABLES
+        let boss = null; // Will be an object when active
+        let playerAmmo = 5;
+        let maxAmmo = 5;
+        let lastRocketReload = 0;
+        let rockets = []; // Array of active rockets
+        let mouseX = 0;
+        let mouseY = 0;
+        let bossActive = false;
+        let distToBoss = 2000; // Trigger boss after this distance (or test value)
+
+        class Rocket {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.speed = 15;
+                this.size = 8;
+                this.active = true;
+
+                // Calculate direction towards mouse
+                const angle = Math.atan2(targetY - y, targetX - x);
+                this.vx = Math.cos(angle) * this.speed;
+                this.vy = Math.sin(angle) * this.speed;
+
+                // Trail system
+                this.trailTimer = 0;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Deactivate if off screen
+                if (this.x > canvasWidth + 100 || this.x < -100 || this.y > canvasHeight + 100 || this.y < -100) {
+                    this.active = false;
+                }
+
+                // Add particles
+                this.trailTimer++;
+                if (this.trailTimer % 2 === 0) {
+                    particleSystem.emit(this.x, this.y, -this.vx * 0.2, -this.vy * 0.2, 15, 3, '#ffaa00', 'circle');
+                }
+            }
+
+            draw(ctx, cameraOffset) {
+                const screenX = this.x - cameraOffset;
+                ctx.fillStyle = '#ff3300';
+                ctx.beginPath();
+                ctx.arc(screenX, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Glow
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff3300';
+                ctx.beginPath();
+                ctx.arc(screenX, this.y, this.size + 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class Boss {
+            constructor() {
+                this.width = 150;
+                this.height = 150;
+                this.x = canvasWidth + 200; // Start off-screen right (relative to camera, actually needs abs coord)
+                this.y = canvasHeight / 2;
+                this.hp = 100;
+                this.maxHp = 100;
+                this.state = 'entering'; // entering, idle, attack
+                this.enterTargetX = 0; // Will be set relative to camera
+                this.moveTimer = 0;
+                this.offsetY = 0;
+            }
+
+            spawn(cameraX) {
+                this.x = cameraX + canvasWidth + 100;
+                this.enterTargetX = cameraX + canvasWidth - 250;
+                this.state = 'entering';
+                this.hp = 100;
+                bossActive = true;
+
+                // Notification
+                const msg = document.createElement('div');
+                msg.textContent = "WARNING: BOSS APPROACHING!";
+                msg.style.position = "fixed";
+                msg.style.top = "20%";
+                msg.style.left = "50%";
+                msg.style.transform = "translate(-50%, -50%)";
+                msg.style.color = "red";
+                msg.style.fontSize = "40px";
+                msg.style.fontWeight = "bold";
+                msg.style.textShadow = "0 0 20px red";
+                msg.style.zIndex = "2000";
+                msg.id = "bossWarning";
+                document.body.appendChild(msg);
+
+                setTimeout(() => {
+                    const el = document.getElementById('bossWarning');
+                    if (el) el.remove();
+                }, 3000);
+            }
+
+            update(cameraX) {
+                if (this.state === 'entering') {
+                    // Fly in from right
+                    if (this.x > this.enterTargetX) {
+                        this.x -= 5;
+                    } else {
+                        this.state = 'idle';
+                    }
+                } else if (this.state === 'idle') {
+                    // Hover up and down
+                    this.moveTimer += 0.03;
+                    this.y = (canvasHeight / 2) + Math.sin(this.moveTimer) * 150;
+
+                    // Keep horizontal position relative to camera
+                    this.x = cameraX + canvasWidth - 250;
+                }
+            }
+
+            draw(ctx, cameraOffset) {
+                const screenX = this.x - cameraOffset;
+
+                // Draw Boss Body (Complex Shape)
+                ctx.save();
+                ctx.translate(screenX, this.y);
+
+                // Glow
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#ff0000';
+
+                // Main Hull
+                ctx.fillStyle = '#440000';
+                ctx.beginPath();
+                ctx.moveTo(0, -60);
+                ctx.lineTo(70, -30);
+                ctx.lineTo(70, 30);
+                ctx.lineTo(0, 60);
+                ctx.lineTo(-50, 30);
+                ctx.lineTo(-50, -30);
+                ctx.closePath();
+                ctx.fill();
+
+                // Cockpit / Eye
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(10, 0, 20, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Engine Thrusters
+                ctx.fillStyle = '#ffaa00';
+                if (Math.random() < 0.5) {
+                    ctx.beginPath();
+                    ctx.moveTo(70, -20);
+                    ctx.lineTo(100 + Math.random() * 20, -20);
+                    ctx.lineTo(70, -10);
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.moveTo(70, 20);
+                    ctx.lineTo(100 + Math.random() * 20, 20);
+                    ctx.lineTo(70, 10);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+
+                // Draw HP Bar
+                const barWidth = 100;
+                const barHeight = 10;
+                ctx.fillStyle = '#333';
+                ctx.fillRect(screenX - 50, this.y - 80, barWidth, barHeight);
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(screenX - 50, this.y - 80, barWidth * (this.hp / this.maxHp), barHeight);
+            }
+        }
+
+        // Initialize Boss
+        boss = new Boss();
 
         // Winding tunnel state
         let pathCenter = ROWS / 2;
@@ -2211,6 +2394,45 @@
                 console.log("🖥️ Desktop device detected - auto-selecting desktop mode");
                 selectDesktopMode();
             }
+
+            // Mouse tracking for Boss Battle
+            document.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = (e.clientX - rect.left) / (rect.width / canvasWidth);
+                mouseY = (e.clientY - rect.top) / (rect.height / canvasHeight);
+            });
+
+            // Shooting for Boss Battle
+            document.addEventListener('mousedown', (e) => {
+                if (gameRunning && bossActive && !gamePaused) {
+                    const now = Date.now();
+                    if (playerAmmo > 0 && now - lastRocketReload > 500) { // Global cooldown 0.5s prevent instant spam
+                        // Fire rocket
+                        const rect = canvas.getBoundingClientRect();
+                        const targetX = (e.clientX - rect.left) / (rect.width / canvasWidth) + cameraOffset;
+                        const targetY = (e.clientY - rect.top) / (rect.height / canvasHeight);
+
+                        // Spawn rocket from player position
+                        // Try to find active player
+                        let sourceX = 0, sourceY = 0;
+                        if (snake1.alive) {
+                            const head = snake1.body[0];
+                            sourceX = head.x * GRID_SIZE + GRID_SIZE / 2;
+                            sourceY = head.y * GRID_SIZE + GRID_SIZE / 2;
+                        } else if (snake2.alive) {
+                            const head = snake2.body[0];
+                            sourceX = head.x * GRID_SIZE + GRID_SIZE / 2;
+                            sourceY = head.y * GRID_SIZE + GRID_SIZE / 2;
+                        } else {
+                            return;
+                        }
+
+                        rockets.push(new Rocket(sourceX, sourceY, targetX, targetY));
+                        playerAmmo--;
+                        // Play sound effect (optional/stub)
+                    }
+                }
+            });
         });
 
         function selectShopTab(tab) {
@@ -3067,6 +3289,35 @@
             // Draw particles
             particleSystem.draw(ctx, cameraOffset);
 
+            // Draw Rockets
+            for (let r of rockets) {
+                r.draw(ctx, cameraOffset);
+            }
+
+            // Draw Boss
+            if (bossActive) {
+                boss.draw(ctx, cameraOffset);
+            }
+
+            // Draw Ammo UI
+            if (bossActive || distanceTraveled > distToBoss - 500) { // Show when near boss
+                ctx.save();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(10, canvasHeight - 60, 160, 50);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Arial';
+                ctx.fillText("ROCKETS:", 20, canvasHeight - 30);
+
+                for (let i = 0; i < maxAmmo; i++) {
+                    ctx.fillStyle = i < playerAmmo ? '#ff3300' : '#444';
+                    ctx.beginPath();
+                    ctx.arc(100 + i * 20, canvasHeight - 35, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
             // Draw UFOs
             drawUFO(snake1, currentTime);
             if (gameMode === 'multiplayer' || gameMode === 'bot') {
@@ -3426,6 +3677,65 @@
                 }
                 lastGeneratedColumn += 10;
             }
+
+            // BOSS BATTLE LOGIC
+            // Reload Ammo
+            if (playerAmmo < maxAmmo) {
+                if (Date.now() - lastRocketReload > 3000) {
+                    playerAmmo++;
+                    lastRocketReload = Date.now();
+                }
+            }
+
+            // Spawn Boss
+            if (!bossActive && distanceTraveled > distToBoss) { // Trigger at distance
+                boss.spawn(cameraOffset);
+            }
+
+            // Update Boss
+            if (bossActive) {
+                boss.update(cameraOffset);
+                if (boss.hp <= 0) {
+                    bossActive = false;
+                    boss.state = 'dead';
+                    // Reward
+                    totalCoins += 500;
+                    // Explosion effect (can add later)
+                    distToBoss += 5000; // Next boss further away
+                }
+            }
+
+            // Update Rockets
+            for (let i = rockets.length - 1; i >= 0; i--) {
+                const r = rockets[i];
+                r.update();
+                if (!r.active) {
+                    rockets.splice(i, 1);
+                    continue;
+                }
+
+                // Collision Rocket vs Boss
+                if (bossActive && boss.state !== 'dead') {
+                    // Simple box collision relative to screen
+                    // Boss is drawn at boss.x - cameraOffset, boss.y
+                    // Rocket is at r.x - cameraOffset, r.y
+                    // We can check absolute coordinates though
+                    const bossScreenX = boss.x;
+                    const bossScreenY = boss.y;
+
+                    if (Math.abs(r.x - bossScreenX) < 80 && Math.abs(r.y - bossScreenY) < 80) {
+                        boss.hp -= 5; // 20 hits to kill
+                        r.active = false;
+                        rockets.splice(i, 1);
+
+                        // Hit effect
+                        for (let k = 0; k < 5; k++) {
+                            particleSystem.emit(r.x, r.y, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5, 10, 2, '#ff0000', 'circle');
+                        }
+                    }
+                }
+            }
+
 
             // Check if snakes fell behind camera (only if not invulnerable)
             if (snake1.alive && !isInvulnerable(snake1) && snake1.body[0].x * GRID_SIZE < cameraOffset - GRID_SIZE) {
